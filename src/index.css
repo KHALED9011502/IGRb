@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-white;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .rtl {
+    direction: rtl;
+    font-family: 'Cairo', sans-serif;
+  }
+
+  .ltr {
+    direction: ltr;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(160, 32, 240, 0.3);
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.2), 0 0 20px rgba(0, 224, 255, 0.2);
+    }
+    to {
+      box-shadow: 0 0 20px rgba(0, 224, 255, 0.4), 0 0 30px rgba(160, 32, 240, 0.4);
+    }
+  }
+}
