@@ -1,6 +1,7 @@
-import { Search, User, LogOut, Menu, X } from 'lucide-react';
+import { Search, User, LogOut, Menu, X, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
+import { CodeAccessModal } from './CodeAccessModal';
 
 type NavbarProps = {
   onNavigate: (page: string) => void;
@@ -11,6 +12,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
   const { user, profile, language, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
 
   const t = {
     ar: {
@@ -18,6 +20,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
       games: 'الألعاب',
       posts: 'المنشورات',
       reviews: 'المراجعات',
+      discussion: 'النقاش',
       wiki: 'الموسوعة',
       search: 'بحث...',
       signIn: 'تسجيل الدخول',
@@ -30,6 +33,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
       games: 'Games',
       posts: 'Posts',
       reviews: 'Reviews',
+      discussion: 'Discussion',
       wiki: 'Wiki',
       search: 'Search...',
       signIn: 'Sign In',
@@ -50,7 +54,15 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
     <nav className={`bg-gray-900/95 backdrop-blur-sm border-b border-cyan-500/20 sticky top-0 z-50 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setCodeModalOpen(true)}
+              className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-cyan-400 transition-colors"
+              title="Enter access code"
+            >
+              <Lock className="w-4 h-4" />
+              <span className="text-sm">Code</span>
+            </button>
             <button
               onClick={() => onNavigate('home')}
               className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform"
@@ -59,7 +71,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
             </button>
 
             <div className="hidden md:flex items-center gap-1">
-              {['home', 'games', 'posts', 'reviews', 'wiki'].map((page) => (
+              {['home', 'games', 'posts', 'reviews', 'discussion', 'wiki'].map((page) => (
                 <button
                   key={page}
                   onClick={() => onNavigate(page)}
@@ -125,6 +137,13 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
           </div>
 
           <button
+            className="md:hidden text-white p-2"
+            onClick={() => setCodeModalOpen(true)}
+          >
+            <Lock className="w-5 h-5" />
+          </button>
+
+          <button
             className="md:hidden text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -132,6 +151,8 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
           </button>
         </div>
       </div>
+
+      <CodeAccessModal isOpen={codeModalOpen} onClose={() => setCodeModalOpen(false)} />
 
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-800/95 backdrop-blur-sm border-t border-gray-700">
@@ -146,7 +167,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
                 className="w-full bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400"
               />
             </div>
-            {['home', 'games', 'posts', 'reviews', 'wiki'].map((page) => (
+            {['home', 'games', 'posts', 'reviews', 'discussion', 'wiki'].map((page) => (
               <button
                 key={page}
                 onClick={() => {

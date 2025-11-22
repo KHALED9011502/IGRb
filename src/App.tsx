@@ -10,6 +10,7 @@ import { PostsPage } from './pages/PostsPage';
 import { ReviewsPage } from './pages/ReviewsPage';
 import { WikiPage } from './pages/WikiPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { DiscussionPage } from './pages/DiscussionPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -41,6 +42,8 @@ function App() {
         return <WikiPage articleId={pageData} />;
       case 'profile':
         return <ProfilePage />;
+      case 'discussion':
+        return <DiscussionPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
