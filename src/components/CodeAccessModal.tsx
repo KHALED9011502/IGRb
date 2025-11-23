@@ -6,9 +6,10 @@ import { supabase } from '../lib/supabase';
 type CodeAccessModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onCodeVerified?: () => void;
 };
 
-export const CodeAccessModal = ({ isOpen, onClose }: CodeAccessModalProps) => {
+export const CodeAccessModal = ({ isOpen, onClose, onCodeVerified }: CodeAccessModalProps) => {
   const { user, language } = useAuth();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -61,47 +62,82 @@ export const CodeAccessModal = ({ isOpen, onClose }: CodeAccessModalProps) => {
       const adminCode = '55804677';
 
       if (code === postingCode || code === adminCode) {
-        const { data: existingRole } = await supabase
+        const { data: existingRole, error: selectError } = await supabase
           .from('user_roles')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle();
 
+        if (selectError && selectError.code !== 'PGRST116') {
+          console.error('Select error:', selectError);
+          setError(text.invalidCode);
+          setLoading(false);
+          return;
+        }
+
         if (code === adminCode) {
           if (existingRole) {
-            await supabase
+            const { error: updateError } = await supabase
               .from('user_roles')
               .update({ is_admin: true, can_post: true })
               .eq('user_id', user.id);
+            if (updateError) {
+              console.error('Update error:', updateError);
+              setError(text.invalidCode);
+              setLoading(false);
+              return;
+            }
           } else {
-            await supabase.from('user_roles').insert({
+            const { error: insertError } = await supabase.from('user_roles').insert({
               user_id: user.id,
               is_admin: true,
               can_post: true,
             });
+            if (insertError) {
+              console.error('Insert error:', insertError);
+              setError(text.invalidCode);
+              setLoading(false);
+              return;
+            }
           }
           setSuccess(text.adminSuccess);
         } else if (code === postingCode) {
           if (existingRole) {
-            await supabase
+            const { error: updateError } = await supabase
               .from('user_roles')
               .update({ can_post: true })
               .eq('user_id', user.id);
+            if (updateError) {
+              console.error('Update error:', updateError);
+              setError(text.invalidCode);
+              setLoading(false);
+              return;
+            }
           } else {
-            await supabase.from('user_roles').insert({
+            const { error: insertError } = await supabase.from('user_roles').insert({
               user_id: user.id,
               can_post: true,
             });
+            if (insertError) {
+              console.error('Insert error:', insertError);
+              setError(text.invalidCode);
+              setLoading(false);
+              return;
+            }
           }
           setSuccess(text.postingSuccess);
         }
 
         setCode('');
+        if (onCodeVerified) {
+          onCodeVerified();
+        }
         setTimeout(() => onClose(), 1500);
       } else {
         setError(text.invalidCode);
       }
     } catch (err) {
+      console.error('Error:', err);
       setError(text.invalidCode);
     } finally {
       setLoading(false);

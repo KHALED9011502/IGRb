@@ -97,11 +97,16 @@ export const DiscussionPage = () => {
 
   const loadUserRole = async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_roles')
       .select('is_admin, can_post')
       .eq('user_id', user.id)
       .maybeSingle();
+
+    if (error) {
+      console.error('Error loading user role:', error);
+    }
+
     setUserRole(data || { is_admin: false, can_post: false });
   };
 
@@ -111,7 +116,7 @@ export const DiscussionPage = () => {
 
     try {
       if (editingPost) {
-        await supabase
+        const { error } = await supabase
           .from('discussion_posts')
           .update({
             title: formData.title,
@@ -120,20 +125,34 @@ export const DiscussionPage = () => {
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingPost.id);
+
+        if (error) {
+          console.error('Update error:', error);
+          alert('Error updating post: ' + error.message);
+          setLoading(false);
+          return;
+        }
       } else {
-        await supabase.from('discussion_posts').insert({
+        const { error } = await supabase.from('discussion_posts').insert({
           title: formData.title,
           content: formData.content,
           platforms: formData.platforms,
           author_id: user?.id,
           language,
         });
+
+        if (error) {
+          console.error('Insert error:', error);
+          alert('Error creating post: ' + error.message);
+          setLoading(false);
+          return;
+        }
       }
 
       setFormData({ title: '', content: '', platforms: [] });
       setEditingPost(null);
       setShowCreateForm(false);
-      loadPosts();
+      await loadPosts();
     } finally {
       setLoading(false);
     }

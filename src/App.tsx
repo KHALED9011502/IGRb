@@ -15,11 +15,16 @@ import { DiscussionPage } from './pages/DiscussionPage';
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [pageData, setPageData] = useState<string | undefined>();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleNavigate = (page: string, data?: string) => {
     setCurrentPage(page);
     setPageData(data);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCodeVerified = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   const renderPage = () => {
@@ -43,7 +48,7 @@ function App() {
       case 'profile':
         return <ProfilePage />;
       case 'discussion':
-        return <DiscussionPage />;
+        return <DiscussionPage key={refreshTrigger} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -52,7 +57,7 @@ function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gray-900">
-        <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
+        <Navbar onNavigate={handleNavigate} currentPage={currentPage} onCodeVerified={handleCodeVerified} />
         <main>{renderPage()}</main>
       </div>
     </AuthProvider>

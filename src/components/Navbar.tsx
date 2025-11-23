@@ -6,9 +6,10 @@ import { CodeAccessModal } from './CodeAccessModal';
 type NavbarProps = {
   onNavigate: (page: string) => void;
   currentPage: string;
+  onCodeVerified?: () => void;
 };
 
-export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
+export const Navbar = ({ onNavigate, currentPage, onCodeVerified }: NavbarProps) => {
   const { user, profile, language, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -152,7 +153,7 @@ export const Navbar = ({ onNavigate, currentPage }: NavbarProps) => {
         </div>
       </div>
 
-      <CodeAccessModal isOpen={codeModalOpen} onClose={() => setCodeModalOpen(false)} />
+      <CodeAccessModal isOpen={codeModalOpen} onClose={() => setCodeModalOpen(false)} onCodeVerified={onCodeVerified} />
 
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-800/95 backdrop-blur-sm border-t border-gray-700">
